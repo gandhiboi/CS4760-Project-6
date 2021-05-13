@@ -10,51 +10,32 @@
 #include <stdbool.h>
 
 #define MAX_USER_PROCESS 18
-#define MEMORY_SIZE 256
+#define NUM_RESOURCES
 
 //Structure for Message Queue
 typedef struct {
-        long mtype;
-        int pid;
-        int address;
-        bool terminate;
-        int page;
-        int readOrWrite;                //read 1 write 0
+	long mtype;
+	char mtext[100];
 } Message;
 
 //Structure for Simulated Clock
 typedef struct {
-        unsigned int sec;
-        unsigned int ns;
+	unsigned int sec;
+	unsigned int ns;
 } SimulatedClock;
 
-//Structure for page table
 typedef struct {
-        int pages[32];
-        int delimiter;
-        int offset;
-} PageTable;
+	int request[MAX_USER_PROCESS];		//resources to be requested
+	int release[MAX_USER_PROCESS];		//resources to be released
+	int allocated[MAX_USER_PROCESS];		//resources to be allocated
+	int sharedResources;				//labels which resources will be shared
+	int numberInstances;				//1-10 number of initial instances in each resource class
+	int availableInstances;			//instances that have not been consumed yet
+} ResourceDescriptors;
 
 typedef struct {
-        PageTable ptable;
-        int pid;
-} ProcessControlBlock;
-
-//Structure for frame table
-typedef struct {
-        int frames;
-        int dirtyBit;
-        int referenceBit;
-        int read;
-        int write;
-        int pid;
-        int SC;
-} FrameTable;
-
-typedef struct {
-        SimulatedClock simClock;
-        ProcessControlBlock pcb;
-        int segFault;
+	SimulatedClock simClock;
+	ResourceDescriptors resource[NUM_RESOURCES];
 } SharedMemory;
 
 void allocateSharedMemory();
@@ -69,4 +50,3 @@ int childMsgQptr();
 int parentMsgQptr();
 
 #endif
-
