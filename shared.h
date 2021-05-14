@@ -10,7 +10,7 @@
 #include <stdbool.h>
 
 #define MAX_USER_PROCESS 18
-#define NUM_RESOURCES
+#define NUM_RESOURCES 20
 
 //Structure for Message Queue
 typedef struct {
@@ -27,10 +27,10 @@ typedef struct {
 typedef struct {
 	int request[MAX_USER_PROCESS];		//resources to be requested
 	int release[MAX_USER_PROCESS];		//resources to be released
-	int allocated[MAX_USER_PROCESS];		//resources to be allocated
-	int sharedResources;				//labels which resources will be shared
-	int numberInstances;				//1-10 number of initial instances in each resource class
-	int availableInstances;			//instances that have not been consumed yet
+	int allocated[MAX_USER_PROCESS];	//resources to be allocated
+	int sharedResourceFlag;			//labels which resources will be shared
+	int numInstancesAvailable;		//1-10 number of initial instances in each resource class
+	int usedInstances;			//instances that have not been consumed yet
 } ResourceDescriptors;
 
 typedef struct {

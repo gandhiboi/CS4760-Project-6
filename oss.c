@@ -24,7 +24,8 @@
 
 //MACROS FOR CAPS OF PROCESSES; TIMER; FILE OUTPUT
 #define MAX_SYSTEM_PROCESS 18
-#define HARD_CAP 40
+#define NUM_RESOURCES 20
+#define HARD_PROCESS_CAP 40
 #define SECONDS 5
 #define NUM_LINES_CAP 100000
 
@@ -32,12 +33,21 @@
 SharedMemory * shared = NULL;
 FILE * fp = NULL;
 Message msg;
+Queue * waitQ;
+
+int pids[MAX_SYSTEM_PROCESS];
+int processCounter = 0;
 
 //MESSAGE QUEUE IDS
 static int pMsgQID;
 static int cMsgQID;
 
 //FUNCTION PROTOTYPES
+void resourceManager(bool);
+void spawnUser();
+void initDescriptors();
+void chooseSharedResources();
+void incrementSimClock(SimulatedClock *, int);
 void allocation();
 void signalHandler(int);
 void setTimer(int);
@@ -49,6 +59,7 @@ int main(int argc, char* argv[]) {
 	//singal handler for timer and ctrl+c
 	signal(SIGINT, signalHandler);
 	signal(SIGALRM, signalHandler);
+
 	srand(time(NULL));
 	
 	//getopt variables
@@ -98,11 +109,84 @@ int main(int argc, char* argv[]) {
 	printf("%s\n", verbose ? "true" : "false");
 	printf("seconds: %d\n", seconds);
 	
-
-	execl("./user_proc", "user_proc", (char*)NULL);
+	allocation();
+	initDescriptors();
+	resourceManager(verbose);
+	spawnUser();
+	
+	sleep(3);
+	
+	releaseSharedMemory();
+	deleteSharedMemory();
+	deleteMessageQueues();
 
 	return EXIT_SUCCESS;
 
+
+}
+
+void resourceManager(bool v) {
+
+	int incrementTime = (rand() % 500000000 - 1000000) + 1000000;
+
+	//while(1) {
+	
+		incrementSimClock(&(shared->simClock), incrementTime);
+		printf("%d:%d\n", shared->simClock.sec, shared->simClock.ns);
+	
+	//}
+
+}
+
+//INCREMENTS SYSTEM SIM CLOCK; CONVERTS NS TO SEC IF WRAPS
+void incrementSimClock(SimulatedClock* timeStruct, int increment) {
+	int nanoSec = timeStruct->ns + increment;
+	
+	while(nanoSec >= 1000000000) {
+		nanoSec -= 1000000000;
+		(timeStruct->sec)++;
+	}
+	timeStruct->ns = nanoSec;
+}
+
+//INITIALIZE VECTORS FOR RESOURCE DESCRIPTORS
+void initDescriptors() {
+	int i;
+	int j;
+	for(i = 0; i < NUM_RESOURCES; i++) {
+		int randNumInstances = (rand() % 10) + 1;
+		shared->resource[i].numInstancesAvailable = randNumInstances;
+		shared->resource[i].usedInstances = randNumInstances;
+		shared->resource[i].sharedResourceFlag = 0;
+		for(j = 0; j < 18; j++) {						//should be j <= 18
+			shared->resource[i].allocated[j] = 0;
+			shared->resource[i].release[j] = 0;
+			shared->resource[i].request[j] = 0;
+		}
+	}
+	chooseSharedResources();
+}
+
+void chooseSharedResources() {
+	int randSharedResources = (rand() % 5) + 1;
+	
+	int i;
+	int randSharedLocation;
+	for(i = 0; i < randSharedResources; i++) {
+		randSharedLocation = (rand() % 20);
+		shared->resource[randSharedLocation].sharedResourceFlag = 1;
+	}
+}
+
+//SPAWNS CHILD PROCESS AND CHECKS IF ABLE TO SPAWN
+void spawnUser() {
+
+	pid_t pid = fork();
+
+	if(pid == 0) {
+		execl("./user_proc", "user_proc", (char*)NULL);
+		exit(EXIT_SUCCESS);
+	}
 
 }
 
@@ -115,6 +199,8 @@ void allocation() {
 	
 	pMsgQID = parentMsgQptr();
 	cMsgQID = childMsgQptr();
+	
+	waitQ = createQueue(MAX_SYSTEM_PROCESS);
 }
 
 //BASIC SIGNAL HANDLER TO CLEAN UP
