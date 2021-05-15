@@ -1,27 +1,77 @@
 # Project 6 - Resource Management
 # Kenan Krijestorac
 # 30 April 2021
-# Completed TBD
+# Completed 05/15/21
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 SOURCES
-
+ 
+- https://www.geeksforgeeks.org/deadlock-detection-algorithm-in-operating-system/
+- class notesCommits on May 14, 2021
+- https://github.com/BrandonLondon/UMSL-4760-Project5 (used as reference for setting up user_proc)
+- https://github.com/jaredible/CS4760-Project-5 (used as reference for setting up oss)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ISSUES
 
-
+-the program gets left hanging waiting for a message, and terminates
+ to the timer almost every time
+-does not print the resource table but it does populate it correctly;
+ does not print because it does not get far enough to reach 20 processes
+ and usually gets left hanging around 18-19 processes
+-seems to be working accordingly with requesting, releasing, and terminating
+ resources; but it just doesn't run to proper termination
+-when running components individually it works properly, but when I implemented
+ it all together it just gets left hanging
+-definitely my worst project to date, apologize for having to grade this,
+ but I plan on fixing it up over the summer since I'm graduating
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 HOW TO RUN
 
-
+1. Type 'make' in the terminal
+2. Run as './oss -v 1' followed by options; if no options are specified, verbose is off
+  a. log file does not have much in it when running with verbose disabled;
+  b. verbose is set with -v 1 and is off by default
+3. Type 'make clean' to remove executables, object files, and log files
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+IMPLEMENTATION
+
+-deadlock detection algorithm is run every second
+-deadlock recovery takes resource that is deadlocked from wait q
+ and terminates; if deadlock is not resolved, it removes another
+ and keeps removing until it is resolved
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 VERSION CONTROL
 
+Commits on May 15, 2021
+did not sleep; very tempermental program runs; sorta does what it is supposed to; last time I will stay up for 28 hours working on a project
 
+Commits on May 14, 2021
+setting up child request/release/terminating resource
+
+@gandhiboi
+gandhiboi committed 19 hours ago
+ 
+more basic setup; rand time generations; renamed variables for personal clarification; forgot to commit yesterday
+@gandhiboi
+gandhiboi committed yesterday
+ 
+Commits on May 12, 2021
+getting the basics setup; shared memory; resource descriptors; etc
+
+@gandhiboi
+gandhiboi committed 3 days ago
+ 
+Commits on Apr 30, 2021
+initial commit
+
+@gandhiboi
+gandhiboi committed 15 days ago
