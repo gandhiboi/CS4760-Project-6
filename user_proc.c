@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/msg.h>
@@ -22,7 +23,9 @@ static int cMsgQID;
 
 //FUNCTION PROTOTYPES
 void allocation();
-SimulatedClock incrementSimClock(SimulatedClock timeStruct, int increment);
+void requestOrRelease(int, int);
+void termination(int, int);
+SimulatedClock incrementSimClock(SimulatedClock, int);
 
 int main(int argc, char * argv[]) {
 
@@ -48,7 +51,48 @@ int main(int argc, char * argv[]) {
 
 	printf("user: hello world\n");
 
+	while(1) {
+	
+	}
+
 	return EXIT_SUCCESS;
+
+}
+
+void requestOrRelease(int reqRelCheck, int pid) {
+
+	int randReq = (rand() % 100);
+	
+	if(randReq < PERCENT_REQUEST) {
+		//SEND REQUEST MESSAGE TO OSS
+		strcpy(msg.mtext, "REQUEST");
+		msg.mtype = pid;
+		msgsnd(cMsgQID, &msg, sizeof(msg), 0);
+		
+		//SELECT WHICH RESOURCE TO REQUEST TO OSS
+		int requestResource = (rand() % 20);
+		sprintf(msg.mtext, "%d", requestResource);
+		msgsnd(cMsgQID, &msg, sizeof(msg), 0);
+		
+		//RANDOMLY SELECT NUMBER OF INSTANCES TO REQUEST FROM OSS
+		int selectInstance = (rand() % shared->resource[requestResource].numInstancesAvailable) + 1;
+		sprintf(msg.mtext, "%d", selectInstance);
+		msgsnd(cMsgQID, &msg, sizeof(msg), 0);
+		
+	}
+	else {
+		//SEND RESOURCE RELEASE MESSAGE TO OSS
+		strcpy(msg.mtext, "RELEASE");
+		msg.mtype = pid;
+		msgsnd(cMsgQID, &msg, sizeof(msg), 0);
+		
+		
+	}
+	
+
+}
+
+void termination(int termCheck, int pid) {
 
 }
 

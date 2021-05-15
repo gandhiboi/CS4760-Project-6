@@ -44,6 +44,9 @@ static int cMsgQID;
 
 //FUNCTION PROTOTYPES
 void resourceManager(bool);
+void requestResource();
+void releaseResource();
+void terminateResource();
 void spawnUser();
 void initDescriptors();
 void chooseSharedResources();
@@ -56,13 +59,13 @@ void usage();
 
 int main(int argc, char* argv[]) {
 
-	//singal handler for timer and ctrl+c
+	//SIGNAL HANDLER FOR TIMER AND CTRL+C
 	signal(SIGINT, signalHandler);
 	signal(SIGALRM, signalHandler);
 
 	srand(time(NULL));
 	
-	//getopt variables
+	//GETOPT VARIABLES
 	int opt;
 	int v;
 	int seconds = SECONDS;
@@ -81,7 +84,6 @@ int main(int argc, char* argv[]) {
 					usage();
 					exit(EXIT_SUCCESS);
 				}
-				
 				if(v == 1) {
 					verbose = true;
 				}
@@ -112,7 +114,6 @@ int main(int argc, char* argv[]) {
 	allocation();
 	initDescriptors();
 	resourceManager(verbose);
-	spawnUser();
 	
 	sleep(3);
 	
@@ -129,12 +130,44 @@ void resourceManager(bool v) {
 
 	int incrementTime = (rand() % 500000000 - 1000000) + 1000000;
 
-	//while(1) {
+	while(1) {
+	
+		msgrcv(cMsgQID, &msg, sizeof(msg), 0, IPC_NOWAIT);
+		
+		if(strcmp(msg.mtext, "REQUEST") == 0) {
+		
+		}
+		else if(strcmp(msg.mtext, "RELEASE") == 0) {
+		
+		}
+		else if(strcmp(msg.mtext, "TERMINATE") == 0) {
+		
+		}
+		else {
+			perror("oss.c: error: no valuable message received from user; terminating program");
+			exit(EXIT_FAILURE);
+		}
 	
 		incrementSimClock(&(shared->simClock), incrementTime);
 		printf("%d:%d\n", shared->simClock.sec, shared->simClock.ns);
 	
-	//}
+	}
+
+}
+
+
+
+void requestResource() {
+
+}
+
+void releaseResource() {
+
+}
+
+void terminateResource() {
+
+	
 
 }
 
